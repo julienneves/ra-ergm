@@ -3,10 +3,11 @@ library(statnet)
 library(tidyr)
 library(igraph)
 library(ggplot2)
+library(parallel)
 
 set.seed(1234)
 
-net_mc <- function(params_true, psi, sigma_e, n, terms, repl = 100) {
+net_ergm <- function(params_true, psi, sigma_e, n, terms, repl = 100) {
 
   # Extract parameters
   alpha = params_true["alpha"]
@@ -65,20 +66,45 @@ net_mc <- function(params_true, psi, sigma_e, n, terms, repl = 100) {
       params_ergm[i, ] <- coef(fit[[1]])
     })
   }
-  return(list(params_ergm, params_nlls, G = G))
+  return(list(params_ergm = params_ergm, params_nlls = params_nlls, G = G))
 }
 
-## Example 1
-# Monte Carlo simulation
+net_mc <- function(x){
+  print(x)
+  val <- net_ergm(params_true, psi = psi, sigma_e = sigma_e, n = n, terms = terms)
+}
+
+## Parallel stuff
+# Calculate the number of cores
+no_cores <- detectCores()
+
+# Initiate cluster
+cl <- makeCluster(round(no_cores/2))
+
+# Include libraries
+clusterEvalQ(cl, c(library(econet),library(statnet), library(tidyr),library(igraph), library(parallel)))
+
+## Monte Carlo simulation
+# Set parameters
+repl <- 100
 params_true <- c(alpha = -1, beta_X = 1, phi = .9)
-result <- net_mc(params_true, psi = 1, sigma_e = 10, n = 50, terms = c("triangle"), repl = 250)
+psi <- 1
+sigma_e <- 10
+n <- 50
+terms <-  c("triangle")
 
-# Plot coefficients
-fig_1 <- ggplot(gather(result[[1]]), aes(value, fill=key)) +
-  geom_density(kernel = "gaussian", alpha = 0.5) +
-  geom_vline(aes(xintercept=params_true), data=gather(as.data.frame(t(params_true))))+
-  geom_vline(aes(xintercept=value), data=gather(as.data.frame(t(result[[2]]))),linetype = 2)+
-  facet_wrap( ~ key) +
-  xlim(-5,5)
+# Export parameters
+clusterExport(cl,list("net_ergm","net_mc","params_true", "psi", "sigma_e", "n", "terms"))
 
-fig_1
+# Simulate repl times
+result <- parLapply(cl, 1:repl, net_mc)
+
+# # Plot coefficients
+# fig_1 <- ggplot(gather(result[[1]]), aes(value, fill=key)) +
+#   geom_density(kernel = "gaussian", alpha = 0.5) +
+#   geom_vline(aes(xintercept=params_true), data=gather(as.data.frame(t(params_true))))+
+#   geom_vline(aes(xintercept=value), data=gather(as.data.frame(t(result[[2]]))),linetype = 2)+
+#   facet_wrap( ~ key) +
+#   xlim(-5,5)
+# 
+# fig_1
