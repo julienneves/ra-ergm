@@ -1,43 +1,56 @@
 library(econet)
+
 library(statnet)
+
 library(tidyr)
-library(igraph)
 library(ggplot2)
 library(parallel)
+library(igraph)
 
-set.seed(1234)
-
-net_ergm <- function(params_true, psi, sigma_e, n, terms, repl = 100) {
-
-  # Extract parameters
-  alpha = params_true["alpha"]
-  beta = params_true[c("beta_X")]
-  phi = params_true["phi"]
-
-  # Set NLLS formula
-  formula <- "y ~ X"
-
-  # Create a seed for network
-  G <- erdos.renyi.game(n, 3*n, type="gnm", directed = FALSE)
-  G <- as.network(get.adjacency(G))
-
+GenerateNetwork <- function(params_net){
+  n <- params_net$n
+  terms <- params_net$terms
+  target_stats <- params_net$target_stats
+  xi <- rnorm(n)
+  
+  formula_obs <- as.formula(paste("G ~ nodecov('xi') + ", paste(terms, collapse = " + ")))
+  formula_true <- as.formula(paste("G ~ ", paste(terms, collapse = " + ")))
+  
+  G <- network.initialize(n , directed = FALSE)
+  G %v% 'xi' <- xi
+  
   # Generate ERGM distribution using seed
-  net_formation_obs <- ergm(as.formula(paste("G ~ sender + receiver +", terms)))
+  net_formation_obs <- ergm(formula_obs, target.stats = c(min(target_stats), target_stats))
 
-  net_formation_true <- net_formation_obs
-  net_formation_true$coef <- net_formation_true$coef[terms]
-  net_formation_true$formula <-  as.formula(paste("G ~", terms))
-
-  # Simulate a network using the true model distribution
+  net_formation_true<- ergm(formula_true, target.stats = target_stats)
+  net_formation_true$coef <- net_formation_obs$coef[terms]
+  
   G_true <- simulate(net_formation_true)
   G_obs <- simulate(net_formation_obs)
-  plot(G)
 
-  # Compute xi from ERGM distribution
-  xi <- net_formation_obs$coef[1:(2 * (n - 1))]
-  xi <- (xi[1:n - 1] + xi[n:(2 * (n - 1))]) / 2
-  xi <- c(-sum(xi), xi)
+  return(list(G_true = G_true, G_obs = G_obs, xi = xi, net_formation_obs = net_formation_obs, net_formation_true = net_formation_true))
+}
 
+EstimateModel <- function(dgp_net, params_net, params_model, repl = 100) {
+  # Extract parameters
+  alpha <- params_model$alpha
+  beta <-  params_model$beta_X
+  phi <-  params_model$phi
+  psi <-  params_model$psi
+  sigma_e <-  params_model$sigma_e
+  
+  coef_true<- list(alpha = alpha, 
+                   beta_X = beta, 
+                   phi = phi)
+  
+  n <-  params_net$n
+  terms <- params_net$terms
+  
+  G_true <- dgp_net$G_true
+  G_obs <- dgp_net$G_true
+  
+  xi <- dgp_net$xi
+  
   # Create y and X
   X <- matrix(rnorm(n * length(beta)), n)
   epsilon <- rnorm(n, 0, sigma_e)
@@ -47,64 +60,62 @@ net_ergm <- function(params_true, psi, sigma_e, n, terms, repl = 100) {
   df <-  data.frame(y, X)
 
   # Estimate ERGM on G
-  net_formation_est <- ergm(as.formula(paste("G_obs ~ sender + receiver +", terms)))
+  net_formation_est <- ergm(as.formula(paste("G_obs ~ sociality +", paste(terms, collapse = " + "))))
 
-  # Drop the xi from the coefficient of the model
+  # Drop the sendder/receiver (xi) from the coefficients of the model
   net_formation_est$coef <- net_formation_est$coef[terms]
-  net_formation_est$formula <-  as.formula(paste("G ~", terms))
+  net_formation_est$formula <-  as.formula(paste("G_obs ~", paste(terms, collapse = " + ")))
 
 
-  fit_nlls <- net_dep(formula = formula, df, G = as.matrix(G_obs), model = "model_B", estimation = "NLLS",  hypothesis = "lim",start.val = params_true, endogeneity = FALSE)
-  params_nlls <- coef(fit_nlls[[1]])
-  params_ergm <- data.frame(t(params_true))
+  fit_nlls <- net_dep(formula = "y ~ X", df, G = as.matrix(G_obs), 
+                      model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
+                      start.val = coef_true, endogeneity = FALSE)
+  coef_nlls <- coef(fit_nlls[[1]])
+  coef_ergm <- data.frame(t(coef_true))
 
   for (i in 1:repl) {
-    G_n <- simulate(net_formation_est)
-    G_n <- as.matrix(G_n)
     tryCatch({
-      fit <- net_dep(formula = formula, df, G = G_n, model = "model_B", estimation = "NLLS", hypothesis = "lim", start.val = params_true, endogeneity = FALSE)
-      params_ergm[i, ] <- coef(fit[[1]])
+      G_n <- simulate(net_formation_est)
+      G_n <- as.matrix(G_n)
+      fit <- net_dep(formula = "y ~ X", df, G = G_n, 
+                     model = "model_B", estimation = "NLLS", hypothesis = "lim", 
+                     start.val = coef_true, endogeneity = FALSE)
+      coef_ergm[i, ] <- coef(fit[[1]])
     })
   }
-  return(list(params_ergm = params_ergm, params_nlls = params_nlls, G = G))
+  return(list(coef_ergm = coef_ergm, coef_nlls = coef_nlls, coef_true = coef_true))
 }
 
-net_mc <- function(x){
-  print(x)
-  val <- net_ergm(params_true, psi = psi, sigma_e = sigma_e, n = n, terms = terms)
-}
-
-## Parallel stuff
-# Calculate the number of cores
-no_cores <- detectCores()
-
-# Initiate cluster
-cl <- makeCluster(round(no_cores/2))
-
-# Include libraries
-clusterEvalQ(cl, c(library(econet),library(statnet), library(tidyr),library(igraph), library(parallel)))
 
 ## Monte Carlo simulation
 # Set parameters
-repl <- 100
-params_true <- c(alpha = -1, beta_X = 1, phi = .9)
-psi <- 1
-sigma_e <- 10
-n <- 50
-terms <-  c("triangle")
+params_model <- list(alpha = .5, 
+                     beta_X = .5, 
+                     phi = 0,
+                     psi = 1,
+                     sigma_e = 1)
 
-# Export parameters
-clusterExport(cl,list("net_ergm","net_mc","params_true", "psi", "sigma_e", "n", "terms"))
+params_net = list(n = 50,
+                  target_stats = c(10,100), 
+                  terms = c("triangle", "edges"))
 
-# Simulate repl times
-result <- parLapply(cl, 1:repl, net_mc)
+# Generate network
+dgp_net <- GenerateNetwork(params_net)
 
-# # Plot coefficients
-# fig_1 <- ggplot(gather(result[[1]]), aes(value, fill=key)) +
-#   geom_density(kernel = "gaussian", alpha = 0.5) +
-#   geom_vline(aes(xintercept=params_true), data=gather(as.data.frame(t(params_true))))+
-#   geom_vline(aes(xintercept=value), data=gather(as.data.frame(t(result[[2]]))),linetype = 2)+
-#   facet_wrap( ~ key) +
-#   xlim(-5,5)
-# 
-# fig_1
+# Plot true and observed network
+par(mfrow=c(1,2)) 
+plot(dgp_net$G_true)
+plot(dgp_net$G_obs)
+
+
+result <- EstimateModel(dgp_net, params_net, params_model)
+
+
+# Plot coefficients
+fig_1 <- ggplot2::ggplot(gather(result[[1]]), aes(value, fill=key)) +
+  geom_density(kernel = "gaussian", alpha = 0.5) +
+  geom_vline(aes(xintercept=value), data=gather(as.data.frame(t(result[[2]]))),linetype = 2)+
+  facet_wrap( ~ key) +
+  xlim(-1,1)
+
+fig_1
