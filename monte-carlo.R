@@ -1,11 +1,10 @@
-library(econet)
-
-library(statnet)
-
 library(tidyr)
 library(ggplot2)
 library(parallel)
-library(igraph)
+
+library(econet)
+library(statnet)
+
 
 GenerateNetwork <- function(params_net){
   n <- params_net$n
@@ -107,8 +106,8 @@ par(mfrow=c(1,2))
 plot(dgp_net$G_true)
 plot(dgp_net$G_obs)
 
-
-result <- EstimateModel(dgp_net, params_net, params_model)
+# Run simulation
+result <- mclapply(1:250, function(x, ...) EstimateModel(...), dgp_net, params_net, params_model)
 
 
 # Plot coefficients
