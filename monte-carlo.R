@@ -69,8 +69,8 @@ EstimateModel <- function(dgp_net, params_net, params_model, repl = 100) {
   fit_nlls <- net_dep(formula = "y ~ X", df, G = as.matrix(G_obs), 
                       model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
                       start.val = coef_true, endogeneity = FALSE)
-  coef_nlls <- coef(fit_nlls[[1]])
-  coef_ergm <- data.frame(t(coef_true))
+  coef_nlls <- t(coef(fit_nlls[[1]]))
+  coef_ergm <- data.frame(coef_nlls)
 
   for (i in 1:repl) {
     tryCatch({
@@ -79,10 +79,10 @@ EstimateModel <- function(dgp_net, params_net, params_model, repl = 100) {
       fit <- net_dep(formula = "y ~ X", df, G = G_n, 
                      model = "model_B", estimation = "NLLS", hypothesis = "lim", 
                      start.val = coef_true, endogeneity = FALSE)
-      coef_ergm[i, ] <- coef(fit[[1]])
+      coef_ergm[i, ] <- t(coef(fit[[1]]))
     })
   }
-  return(list(coef_ergm = coef_ergm, coef_nlls = coef_nlls, coef_true = coef_true))
+  return(list(coef_ergm = coef_ergm, coef_nlls = coef_nlls, coef_true = as.data.frame(coef_true)))
 }
 
 
@@ -103,15 +103,19 @@ dgp_net <- GenerateNetwork(params_net)
 
 # Plot true and observed network
 par(mfrow=c(1,2)) 
-plot(dgp_net$G_true)
-plot(dgp_net$G_obs)
+plot(dgp_net$G_true, coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
+plot(dgp_net$G_obs,  coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
 
 # Run simulation
-result <- mclapply(1:250, function(x, ...) EstimateModel(...), dgp_net, params_net, params_model)
+#result <- mclapply(1:250, function(x, ...) EstimateModel(...), dgp_net, params_net, params_model)
+result <- EstimateModel(dgp_net, params_net, params_model, repl = 100)
+
+coef_nlls <- t(sapply(result, function(x) x$coef_nlls))
+coef_ergm <- t(sapply(result, function(x) mean(x$coef_ergm)))
 
 
 # Plot coefficients
-fig_1 <- ggplot2::ggplot(gather(result[[1]]), aes(value, fill=key)) +
+fig_1 <- ggplot2::ggplot(gather(coef_nlls), aes(value, fill=key)) +
   geom_density(kernel = "gaussian", alpha = 0.5) +
   geom_vline(aes(xintercept=value), data=gather(as.data.frame(t(result[[2]]))),linetype = 2)+
   facet_wrap( ~ key) +
