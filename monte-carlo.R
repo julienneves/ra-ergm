@@ -87,13 +87,7 @@ EstimateModel <- function(dgp_net, params_net, params_model, repl = 100) {
 
 
 ## Monte Carlo simulation
-# Set parameters
-params_model <- list(alpha = .5, 
-                     beta_X = .5, 
-                     phi = 0,
-                     psi = 1,
-                     sigma_e = 1)
-
+# Generate network
 params_net = list(n = 50,
                   target_stats = c(10,100), 
                   terms = c("triangle", "edges"))
@@ -107,12 +101,24 @@ plot(dgp_net$G_true, coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling
 plot(dgp_net$G_obs,  coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
 
 # Run simulation
-#result <- mclapply(1:250, function(x, ...) EstimateModel(...), dgp_net, params_net, params_model)
-result <- EstimateModel(dgp_net, params_net, params_model, repl = 100)
+# Set parameters
+params_model_1 <- list(alpha = .5, 
+                     beta_X = .5, 
+                     phi = 0,
+                     psi = 1,
+                     sigma_e = 1)
+result_1 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_net, params_model_1)
+
+params_model_2 <- list(alpha = .5, 
+                       beta_X = .5, 
+                       phi = 0.8,
+                       psi = 1,
+                       sigma_e = 1)
+result_2 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_net, params_model_2)
+
 
 coef_nlls <- t(sapply(result, function(x) x$coef_nlls))
 coef_ergm <- t(sapply(result, function(x) mean(x$coef_ergm)))
-
 
 # Plot coefficients
 fig_1 <- ggplot2::ggplot(gather(coef_nlls), aes(value, fill=key)) +
