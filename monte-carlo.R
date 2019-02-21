@@ -2,6 +2,7 @@ library(tidyr)
 library(ggplot2)
 library(parallel)
 
+library(miscTools)
 library(econet)
 library(statnet)
 
@@ -86,6 +87,24 @@ EstimateModel <- function(dgp_net, params_net, params_model, repl = 100) {
 }
 
 
+SimulationPlot <- function(result){
+  coef_mean <- t(sapply(result, function(x) colMeans(x$coef_ergm)))
+  coef_median <- t(sapply(result, function(x) colMedians(x$coef_ergm)))
+  coef_nlls <- t(sapply(result, function(x) colMeans(x$coef_nlls)))
+  coef_true <- t(sapply(result, function(x) colMeans(x$coef_true)))
+  
+  
+  fig <- ggplot(NULL, aes(value)) + 
+    geom_density(aes(value, fill = "mean"), data = gather(as.data.frame(coef_mean)), kernel = "gaussian", alpha = 0.6) +
+    geom_density(aes(value, fill = "median"), data = gather(as.data.frame(coef_median)), kernel = "gaussian", alpha = 0.4) +
+    geom_density(aes(value, fill = "nlls"), data = gather(as.data.frame(coef_nlls)), kernel = "gaussian", alpha = 0.2) +
+    geom_vline(aes(xintercept = value), data = gather(as.data.frame(coef_true))) +
+    facet_wrap(~ key, scales = "free_x") +
+    theme(legend.position = "right")
+  fig
+  return(fig)
+}
+
 ## Monte Carlo simulation
 # Generate network
 params_net = list(n = 50,
@@ -96,35 +115,32 @@ params_net = list(n = 50,
 dgp_net <- GenerateNetwork(params_net)
 
 # Plot true and observed network
+png("output/network_02_21.png")
 par(mfrow=c(1,2)) 
 plot(dgp_net$G_true, coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
+title("True Network")
 plot(dgp_net$G_obs,  coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
+title("Observed Network")
+dev.off()
 
-# Run simulation
-# Set parameters
+# Example 1
 params_model_1 <- list(alpha = .5, 
                      beta_X = .5, 
                      phi = 0,
                      psi = 1,
                      sigma_e = 1)
 result_1 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_net, params_model_1)
+fig_1 <- SimulationPlot(result_1)
+ggsave("output/example_1_02_21.png")
+fig_1
 
+# Example 2
 params_model_2 <- list(alpha = .5, 
                        beta_X = .5, 
                        phi = 0.8,
                        psi = 1,
                        sigma_e = 1)
 result_2 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_net, params_model_2)
-
-
-coef_nlls <- t(sapply(result, function(x) x$coef_nlls))
-coef_ergm <- t(sapply(result, function(x) mean(x$coef_ergm)))
-
-# Plot coefficients
-fig_1 <- ggplot2::ggplot(gather(coef_nlls), aes(value, fill=key)) +
-  geom_density(kernel = "gaussian", alpha = 0.5) +
-  geom_vline(aes(xintercept=value), data=gather(as.data.frame(t(result[[2]]))),linetype = 2)+
-  facet_wrap( ~ key) +
-  xlim(-1,1)
-
-fig_1
+fig_2 <- SimulationPlot(result_2)
+ggsave("output/example_2_02_21.png")
+fig_2
