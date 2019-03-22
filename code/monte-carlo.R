@@ -5,6 +5,7 @@ library(parallel)
 
 library(miscTools)
 library(econet)
+library(Matrix)
 library(statnet)
 
 source('~/Dropbox/Work/Research/ergm/code/estimation-functions.R')
@@ -13,7 +14,7 @@ source('~/Dropbox/Work/Research/ergm/code/ploting-functions.R')
 
 ## Parameters
 params_net <- list(n = 50,
-                   target_stats = c(10,100), 
+                   target_stats = c(20,150), 
                    terms = c("triangle", "edges"))
 
 # Generate network
