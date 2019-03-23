@@ -12,12 +12,8 @@ GenerateData <- function(params_model, dgp_net){
   xi <- dgp_net$xi
   epsilon <- rnorm(n, 0, sigma_e)
   
-  seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
-  
   # Create y and X
-  set.seed(1)
-  X <- matrix(rnorm(n * length(beta)), n)
-  set.seed(seed)
+  X <- dgp_net$X
   
   y <- solve((diag(n) - phi * as.matrix(G_true)),  alpha + X %*% beta + psi * xi + epsilon)
   
@@ -32,6 +28,9 @@ GenerateNetwork <- function(params_net){
   terms <- params_net$terms
   target_stats <- params_net$target_stats
   xi <- rnorm(n)
+  
+  # Create y and X
+  X <- matrix(rnorm(n), n)
   
   formula_obs <- as.formula(paste("G ~ nodecov('xi') + ", paste(terms, collapse = " + ")))
   formula_true <- as.formula(paste("G ~ ", paste(terms, collapse = " + ")))
@@ -58,6 +57,7 @@ GenerateNetwork <- function(params_net){
   return(list(G_true = G_true, 
               G_obs = G_obs,
               xi = xi, 
+              X = X,
               net_formation_est = net_formation_est, 
               net_formation_obs = net_formation_obs, 
               net_formation_true = net_formation_true))
