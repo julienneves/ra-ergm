@@ -7,14 +7,13 @@ GenerateData <- function(params_model, dgp_net){
   sigma_e <-  params_model$sigma_e
   
   G_true <- dgp_net$G_true
-  
-  n <-  G_true$gal$n
   xi <- dgp_net$xi
-  epsilon <- rnorm(n, 0, sigma_e)
-  
-  # Create y and X
   X <- dgp_net$X
   
+  n <-  G_true$gal$n
+  epsilon <- rnorm(n, 0, sigma_e)
+  
+  # Create y
   y <- solve((diag(n) - phi * as.matrix(G_true)),  alpha + X %*% beta + psi * xi + epsilon)
   
   # Gather y, X in a data frame
@@ -26,6 +25,7 @@ GenerateData <- function(params_model, dgp_net){
 GenerateNetwork <- function(params_net){
   n <- params_net$n
   terms <- params_net$terms
+  target_xi <- params_net$target_xi
   target_stats <- params_net$target_stats
   xi <- rnorm(n)
   
@@ -39,7 +39,7 @@ GenerateNetwork <- function(params_net){
   G %v% 'xi' <- xi
   
   # Generate ERGM distribution using seed
-  net_formation_obs <- ergm(formula_obs, target.stats = c(mean(target_stats), target_stats))
+  net_formation_obs <- ergm(formula_obs, target.stats = c(target_xi, target_stats))
   
   net_formation_true<- ergm(formula_true, target.stats = target_stats)
   net_formation_true$coef <- net_formation_obs$coef[terms]

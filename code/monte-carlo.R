@@ -8,15 +8,16 @@ library(econet)
 library(Matrix)
 library(statnet)
 
-source('~/Dropbox/Work/Research/ergm/code/estimation-functions.R')
-source('~/Dropbox/Work/Research/ergm/code/generative-functions.R')
-source('~/Dropbox/Work/Research/ergm/code/ploting-functions.R')
+source('~/GitHub/ra-ergm/code/estimation-functions.R')
+source('~/GitHub/ra-ergm/code/generative-functions.R')
+source('~/GitHub/ra-ergm/code/ploting-functions.R')
 
 # Set seed
 set.seed(123)
 
 ## Parameters
 params_net <- list(n = 50,
+                   target_xi = 85,
                    target_stats = c(20,150), 
                    terms = c("triangle", "edges"))
 
@@ -63,7 +64,7 @@ params_model <- list(alpha = .5,
                      sigma_e = 1)
 result_3 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_model)
 fig_3 <- SimulationPlot(result_3)
-ggsave("output/example_2_03_21.png")
+ggsave("output/example_3_03_21.png")
 fig_3
 
 # Example 4
@@ -74,5 +75,5 @@ params_model <- list(alpha = .5,
                      sigma_e = 10)
 result_4 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_model)
 fig_4 <- SimulationPlot(result_4)
-ggsave("output/example_2_03_21.png")
+ggsave("output/example_4_03_21.png")
 fig_4
