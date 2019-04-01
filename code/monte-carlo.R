@@ -15,7 +15,8 @@ source('~/GitHub/ra-ergm/code/ploting-functions.R')
 # Set seed
 set.seed(123)
 
-## Parameters
+## Create network
+# Set parameters
 params_net <- list(n = 50,
                    target_xi = 85,
                    target_stats = c(20,150), 
@@ -33,47 +34,32 @@ plot(dgp_net$G_obs,  coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling
 title("Observed Network")
 dev.off()
 
+## Run Monte Carlo simulation
+# Set parameters grid
+alpha <- 0.5
+beta <- c(.5,5,10)
+phi <- c(-0.2, -0.1, 0, 0.1, 0.2)
+psi <- c(1, 10, 100)
+sigma_e <- 1
 
-# Example 1
-params_model <- list(alpha = .5, 
-                     beta_X = .5, 
-                     phi = 0,
-                     psi = 1,
-                     sigma_e = 1)
-result_1 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_model)
-fig_1 <- SimulationPlot(result_1)
-ggsave("output/example_1_03_21.png")
-fig_1
+# Set number of replications
+repl <- 100
 
-# Example 2
-params_model <- list(alpha = .5, 
-                     beta_X = .5, 
-                     phi = 0.8,
-                     psi = 1,
-                     sigma_e = 1)
-result_2 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_model)
-fig_2 <- SimulationPlot(result_2)
-ggsave("output/example_2_03_21.png")
-fig_2
+# Create a data frame to hold parameters and p-values
+params <- expand.grid(alpha, beta, phi, psi, sigma_e)
+colnames(params) <-c("alpha", "beta", "phi", "psi", "sigma_e")
 
-# Example 3
-params_model <- list(alpha = .5, 
-                     beta_X = .5, 
-                     phi = 0.8,
-                     psi = 10,
-                     sigma_e = 1)
-result_3 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_model)
-fig_3 <- SimulationPlot(result_3)
-ggsave("output/example_3_03_21.png")
-fig_3
+result <- vector("list", nrow(params)) 
 
-# Example 4
-params_model <- list(alpha = .5, 
-                     beta_X = .5, 
-                     phi = 0.8,
-                     psi = 1,
-                     sigma_e = 10)
-result_4 <- mclapply(1:100, function(x, ...) EstimateModel(...), dgp_net, params_model)
-fig_4 <- SimulationPlot(result_4)
-ggsave("output/example_4_03_21.png")
-fig_4
+for (i in 1:nrow(params)){
+  params_model <- list(alpha = params[i,"alpha"], 
+                       beta_X = params[i,"beta"], 
+                       phi = params[i,"phi"],
+                       psi = params[i,"psi"],
+                       sigma_e =  params[i,"sigma_e"])
+  result[[i]] <- mclapply(1:repl, function(x, ...) EstimateModel(...), dgp_net, params_model)
+  cat("Trial",i,"Out of",nrow(params))
+}
+
+## Print results
+
