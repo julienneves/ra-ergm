@@ -36,8 +36,8 @@ dev.off()
 
 ## Run Monte Carlo simulation
 # Set parameters grid
-alpha <- 0.5
-beta <- c(.5,5,10)
+alpha <- 0
+beta <- c(0,1,10)
 phi <- c(-0.2, -0.1, 0, 0.1, 0.2)
 psi <- c(1, 10, 100)
 sigma_e <- 1
@@ -51,13 +51,34 @@ colnames(params) <-c("alpha", "beta", "phi", "psi", "sigma_e")
 
 result <- vector("list", nrow(params)) 
 
+
+numCores <- detectCores()
+cl <- makeCluster(numCores)
+clusterEvalQ(cl, {
+  library(tidyr)
+  library(dplyr)
+  library(ggplot2)
+  library(parallel)
+  
+  library(miscTools)
+  library(econet)
+  library(Matrix)
+  library(statnet)
+})
+
+clusterExport(cl, {"EstimateModel"
+  "GenerateData"
+  "EstimateNLLS"
+  "EstimateERGM"})
+
+
 for (i in 1:nrow(params)){
   params_model <- list(alpha = params[i,"alpha"], 
                        beta_X = params[i,"beta"], 
                        phi = params[i,"phi"],
                        psi = params[i,"psi"],
                        sigma_e =  params[i,"sigma_e"])
-  result[[i]] <- mclapply(1:repl, function(x, ...) EstimateModel(...), dgp_net, params_model)
+  result[[i]] <- parLapply(cl, 1:repl, function(x, ...) EstimateModel(...), dgp_net, params_model)
   cat("Trial",i,"Out of",nrow(params))
 }
 
