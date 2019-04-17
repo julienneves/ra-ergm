@@ -22,6 +22,8 @@ EstimateNLLS <- function(data, dgp_net, start_val) {
 
 EstimateERGM <- function(data, dgp_net, start_val, repl = 99) {
 
+  G_obs <- dgp_net$G_obs
+  
   df <- bind_rows(replicate(repl, data, simplify = FALSE)) 
   
   G <- simulate(dgp_net$net_formation_est, nsim = repl)

@@ -14,7 +14,8 @@ GenerateData <- function(params_model, dgp_net){
   epsilon <- rnorm(n, 0, sigma_e)
   
   # Create y
-  y <- solve((diag(n) - phi * as.matrix(G_true)),  alpha + X %*% beta + psi * xi + epsilon)
+  y <- solve((diag(n) - phi * as.matrix(G_true)),  alpha + X %*% beta + epsilon)
+  # y <- solve((diag(n) - phi * as.matrix(G_true)),  alpha + X %*% beta + psi * xi + epsilon)
   
   # Gather y, X in a data frame
   df <-  data.frame(y, X)
@@ -27,32 +28,48 @@ GenerateNetwork <- function(params_net){
   terms <- params_net$terms
   target_xi <- params_net$target_xi
   target_stats <- params_net$target_stats
-  xi <- rnorm(n)
-  
+
   # Create y and X
+  xi <- rnorm(n)
   X <- matrix(rnorm(n), n)
   
-  formula_obs <- as.formula(paste("G ~ nodecov('xi') + ", paste(terms, collapse = " + ")))
-  formula_true <- as.formula(paste("G ~ ", paste(terms, collapse = " + ")))
+  # formula_obs <- as.formula(paste("G ~ nodecov('xi') + ", paste(terms, collapse = " + ")))
+  # formula_true <- as.formula(paste("G ~ ", paste(terms, collapse = " + ")))
+  # 
+  # G <- network.initialize(n , directed = FALSE)
+  # G %v% 'xi' <- xi
+  # 
+  # # Generate ERGM distribution using seed
+  # net_formation_obs <- ergm(formula_obs, target.stats = c(target_xi, target_stats))
+  # 
+  # net_formation_true<- ergm(formula_true, target.stats = target_stats)
+  # net_formation_true$coef <- net_formation_obs$coef[terms]
+  # 
+  # G_true <- simulate(net_formation_true)
+  # G_obs <- simulate(net_formation_obs)
+  # 
+  # # Estimate ERGM on G
+  # net_formation_est <- ergm(as.formula(paste("G_obs ~ sociality +", paste(terms, collapse = " + "))))
+  # 
+  # # Drop the sender/receiver (xi) from the coefficients of the model
+  # net_formation_est$coef <- net_formation_est$coef[terms]
+  # net_formation_est$formula <-  as.formula(paste("G_obs ~", paste(terms, collapse = " + ")))
   
+  formula_obs <- as.formula(paste("G ~ ", paste(terms, collapse = " + ")))
+  formula_true <- as.formula(paste("G ~ hamming(G_obs) + ", paste(terms, collapse = " + ")))
+
   G <- network.initialize(n , directed = FALSE)
   G %v% 'xi' <- xi
-  
+
   # Generate ERGM distribution using seed
-  net_formation_obs <- ergm(formula_obs, target.stats = c(target_xi, target_stats))
-  
-  net_formation_true<- ergm(formula_true, target.stats = target_stats)
-  net_formation_true$coef <- net_formation_obs$coef[terms]
-  
-  G_true <- simulate(net_formation_true)
+  net_formation_obs <- ergm(formula_obs, target.stats = target_stats)
   G_obs <- simulate(net_formation_obs)
   
+  net_formation_true <- ergm(formula_true, target.stats = c(target_xi,target_stats))
+  G_true <- simulate(net_formation_true)
+
   # Estimate ERGM on G
-  net_formation_est <- ergm(as.formula(paste("G_obs ~ sociality +", paste(terms, collapse = " + "))))
-  
-  # Drop the sender/receiver (xi) from the coefficients of the model
-  net_formation_est$coef <- net_formation_est$coef[terms]
-  net_formation_est$formula <-  as.formula(paste("G_obs ~", paste(terms, collapse = " + ")))
+  net_formation_est <- net_formation_true
   
   return(list(G_true = G_true, 
               G_obs = G_obs,

@@ -26,7 +26,7 @@ params_net <- list(n = 50,
 dgp_net <- GenerateNetwork(params_net)
 
 # Plot true and observed network
-png("output/network_03_21.png")
+png("output/network_04_17.png")
 par(mfrow=c(1,2)) 
 plot(dgp_net$G_true, coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
 title("True Network")
@@ -34,20 +34,30 @@ plot(dgp_net$G_obs,  coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling
 title("Observed Network")
 dev.off()
 
+
+params_model <- list(alpha = 0, 
+                     beta_X = 0.2, 
+                     phi = .5,
+                     psi = 1,
+                     sigma_e =  1)
+fit <- EstimateModel(dgp_net, params_model)
+
+
 ## Run Monte Carlo simulation
 # Set parameters grid
 alpha <- 0
-beta <- c(0,1,10)
+beta <- c(0.5)
 phi <- c(-0.2, -0.1, 0, 0.1, 0.2)
-psi <- c(1, 10, 100)
-sigma_e <- 1
+psi <- c(1)
+sigma_e <- c(10)
 
 # Set number of replications
 repl <- 100
 
 # Create a data frame to hold parameters and p-values
 params <- expand.grid(alpha, beta, phi, psi, sigma_e)
-colnames(params) <-c("alpha", "beta", "phi", "psi", "sigma_e")
+colnames(params) <-c("alpha", "beta_X", "phi", "psi", "sigma_e")
+params <- tibble::rownames_to_column(params,"trial")
 
 result <- vector("list", nrow(params)) 
 
@@ -74,7 +84,7 @@ clusterExport(cl, {"EstimateModel"
 
 for (i in 1:nrow(params)){
   params_model <- list(alpha = params[i,"alpha"], 
-                       beta_X = params[i,"beta"], 
+                       beta_X = params[i,"beta_X"], 
                        phi = params[i,"phi"],
                        psi = params[i,"psi"],
                        sigma_e =  params[i,"sigma_e"])
