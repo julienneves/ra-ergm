@@ -3,15 +3,33 @@ EstimateModel <- function(dgp_net, params_model) {
   data <- GenerateData(params_model, dgp_net)
   
   coef_true <- params_model[c("alpha", "beta_X", "phi")]
-  coef_nlls <- EstimateNLLS(data, dgp_net, start_val = coef_true)
-  coef_ergm <- tryCatch({EstimateERGM(data, dgp_net, start_val = coef_true)})
   
-  return(list(coef_ergm = coef_ergm, coef_nlls = coef_nlls, coef_true = as.data.frame(coef_true)))
+  coef_nlls_true <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "true")
+  
+  coef_nlls_obs <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "obs")
+  
+  coef_nlls_alumni <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "alumni")
+  
+  coef_ergm <- tryCatch({EstimateERGM(data, dgp_net, start_val = coef_true, repl = params_model$B)})
+  
+  return(list(coef_ergm = coef_ergm, 
+              coef_nlls_true = coef_nlls_true, 
+              coef_nlls_obs = coef_nlls_obs, 
+              coef_nlls_alumni = coef_nlls_alumni, 
+              coef_true = as.data.frame(coef_true)))
 }
 
-EstimateNLLS <- function(data, dgp_net, start_val) {
+EstimateNLLS <- function(data, dgp_net, start_val, type) {
   
-  G <- as.matrix(dgp_net$G_obs)
+  if (type == "true"){
+    G <- as.matrix(dgp_net$G_true)
+  } else if (type == "obs") {
+    G <- as.matrix(dgp_net$G_obs)
+  } else if (type == "alumni"){
+    G <- as.matrix(dgp_net$G_alumni)
+  } else {
+    warning("No G specified")
+  }
   
   fit<- net_dep(formula = "y ~ X", data = data, G = G, 
                       model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
@@ -20,9 +38,11 @@ EstimateNLLS <- function(data, dgp_net, start_val) {
   return(coef_nlls)
 }
 
+
 EstimateERGM <- function(data, dgp_net, start_val, repl = 99) {
 
   G_obs <- dgp_net$G_obs
+  G_alumni <- dgp_net$G_alumni
   
   df <- bind_rows(replicate(repl, data, simplify = FALSE)) 
   

@@ -8,9 +8,13 @@ library(econet)
 library(Matrix)
 library(statnet)
 
-source('~/GitHub/ra-ergm/code/estimation-functions.R')
-source('~/GitHub/ra-ergm/code/generative-functions.R')
-source('~/GitHub/ra-ergm/code/ploting-functions.R')
+source('~/Dropbox/Work/Research/ergm/code/estimation-functions.R')
+source('~/Dropbox/Work/Research/ergm/code/generative-functions.R')
+source('~/Dropbox/Work/Research/ergm/code/ploting-functions.R')
+
+# source('~/GitHub/ra-ergm/code/estimation-functions.R')
+# source('~/GitHub/ra-ergm/code/generative-functions.R')
+#source('~/GitHub/ra-ergm/code/ploting-functions.R')
 
 # Set seed
 set.seed(123)
@@ -18,16 +22,19 @@ set.seed(123)
 ## Create network
 # Set parameters
 params_net <- list(n = 50,
-                   target_xi = 85,
-                   target_stats = c(20,150), 
-                   terms = c("triangle", "edges"))
+                   target_stats_alumni = c(20, 150, 10),
+                   terms_alumni = c("triangle", "edges"),
+                   target_stats_true = c(50, 30, 200, 10, 10), 
+                   terms_true = c("hamming(G_alumni)", "triangle", "edges"))
 
 # Generate network
 dgp_net <- GenerateNetwork(params_net)
 
 # Plot true and observed network
 png("output/network_04_17.png")
-par(mfrow=c(1,2)) 
+par(mfrow=c(1,3)) 
+plot(dgp_net$G_alumni,  coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
+title("Alumni Network")
 plot(dgp_net$G_true, coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
 title("True Network")
 plot(dgp_net$G_obs,  coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling(sqrt(params_net$n)))[1:params_net$n,])
@@ -38,8 +45,8 @@ dev.off()
 params_model <- list(alpha = 0, 
                      beta_X = 0.2, 
                      phi = .5,
-                     psi = 1,
-                     sigma_e =  1)
+                     sigma_e =  1,
+                     B = 99)
 fit <- EstimateModel(dgp_net, params_model)
 
 
@@ -48,7 +55,6 @@ fit <- EstimateModel(dgp_net, params_model)
 alpha <- 0
 beta <- c(0.5)
 phi <- c(-0.2, -0.1, 0, 0.1, 0.2)
-psi <- c(1)
 sigma_e <- c(10)
 
 # Set number of replications

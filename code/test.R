@@ -9,16 +9,23 @@ library(Matrix)
 library(statnet)
 
 coef_ergm <- as.data.frame(result[[1]][[1]]$coef_ergm)[FALSE,]
-coef_nlls <- coef_ergm
-
-mean_ergm <- coef_ergm
-sd_ergm <- coef_ergm
-
-mean_nlls <- coef_ergm
-sd_nlls <- coef_ergm
-
+coef_nlls_true <- coef_ergm
+coef_nlls_alumni <- coef_ergm
+coef_nlls_obs <- coef_ergm
 coef_true <- coef_ergm
+
 mean_true <- coef_ergm
+mean_ergm <- coef_ergm
+mean_nlls_true <- coef_ergm
+mean_nlls_alumni <- coef_ergm
+mean_nlls_obs <- coef_ergm
+mean_true <- coef_ergm
+
+sd_ergm <- coef_ergm
+sd_nlls_true <- coef_ergm
+sd_nlls_alumni <- coef_ergm
+sd_nlls_obs <- coef_ergm
+sd_true <- coef_ergm
 
 for (i in 1:length(result)) {
   a <- result[[i]]
@@ -26,7 +33,9 @@ for (i in 1:length(result)) {
   
   for (j in 1:length(a)) {
     coef_ergm[j, ] <- a[[j]]$coef_ergm
-    coef_nlls[j, ] <- a[[j]]$coef_nlls
+    coef_nlls_true[j, ] <- a[[j]]$coef_nlls_true
+    coef_nlls_alumni[j, ] <- a[[j]]$coef_nlls_alumni
+    coef_nlls_obs[j, ] <- a[[j]]$coef_nlls_obs
     coef_true[j, ] <- a[[j]]$coef_true
   }
   
