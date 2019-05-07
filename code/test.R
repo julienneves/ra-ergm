@@ -42,8 +42,14 @@ for (i in 1:length(result)) {
   mean_ergm[i, ] <- as.data.frame(t(sapply(coef_ergm, mean, na.rm = TRUE)))
   sd_ergm[i, ] <- as.data.frame(t(sapply(coef_ergm, sd, na.rm = TRUE)))
   
-  mean_nlls[i, ] <- as.data.frame(t(sapply(coef_nlls, mean, na.rm = TRUE)))
-  sd_nlls[i, ] <- as.data.frame(t(sapply(coef_nlls, sd, na.rm = TRUE)))
+  mean_nlls_true[i, ] <- as.data.frame(t(sapply(coef_nlls_true, mean, na.rm = TRUE)))
+  sd_nlls_true[i, ] <- as.data.frame(t(sapply(coef_nlls_true, sd, na.rm = TRUE)))
+  
+  mean_nlls_alumni[i, ] <- as.data.frame(t(sapply(coef_nlls_alumni, mean, na.rm = TRUE)))
+  sd_nlls_alumni[i, ] <- as.data.frame(t(sapply(coef_nlls_alumni, sd, na.rm = TRUE)))
+  
+  mean_nlls_obs[i, ] <- as.data.frame(t(sapply(coef_nlls_obs, mean, na.rm = TRUE)))
+  sd_nlls_obs[i, ] <- as.data.frame(t(sapply(coef_nlls_obs, sd, na.rm = TRUE)))
   
   mean_true[i, ] <- as.data.frame(t(sapply(coef_true, mean, na.rm = TRUE)))
   
@@ -52,44 +58,25 @@ for (i in 1:length(result)) {
 names(params)[2] <- "beta_X"
 
 names(mean_ergm) <- c("alpha_ergm", "beta_X_ergm", "phi_ergm")
-names(mean_nlls) <- c("alpha_nlls", "beta_X_nlls", "phi_nlls")
+names(mean_nlls_true) <- c("alpha_true", "beta_X_true", "phi_true")
+names(mean_nlls_alumni) <- c("alpha_alumni", "beta_X_alumni", "phi_alumni")
+names(mean_nlls_obs) <- c("alpha_obs", "beta_X_obs", "phi_obs")
 names(sd_ergm) <- c("alpha_ergm_sd", "beta_X_ergm_sd", "phi_ergm_sd")
-names(sd_nlls) <- c("alpha_nlls_sd", "beta_X_nlls_sd", "phi_nlls_sd")
+names(sd_nlls_true) <- c("alpha_true_sd", "beta_X_true_sd", "phi_true_sd")
+names(sd_nlls_alumni) <- c("alpha_alumni_sd", "beta_X_alumni_sd", "phi_alumni_sd")
+names(sd_nlls_obs) <- c("alpha_obs_sd", "beta_X_obs_sd", "phi_obs_sd")
 
-df <- bind_cols(params, mean_ergm, mean_nlls, sd_ergm, sd_nlls)
 
-fig1 <- ggplot(data = df) +   
-  geom_hline(aes(yintercept= phi)) +
-  geom_point(aes(beta_X, phi_ergm, colour = "ergm")) +
-  geom_point(aes(beta_X, phi_nlls, colour = "nlls"))  +
-  geom_errorbar(aes(beta_X, ymin = phi_ergm - 1.96 * phi_ergm_sd, ymax = phi_ergm + 1.96 * phi_ergm_sd, colour = "ergm")) +
-  geom_errorbar(aes(beta_X, ymin = phi_nlls - 1.96 * phi_nlls_sd, ymax = phi_nlls + 1.96 * phi_nlls_sd, colour = "nlls"))  +
-  facet_wrap(c("phi", "psi"), ncol = 3) +
-  scale_colour_manual(name="Type", values=c(ergm="red", nlls="blue"))+
-  coord_cartesian( ylim = c(-0.3, .3)) +
-  ylab("phi") + theme_minimal()
+df <- bind_cols(params, mean_ergm, mean_nlls_true, mean_nlls_alumni, mean_nlls_obs, sd_ergm, sd_nlls_true, sd_nlls_alumni, sd_nlls_obs)
+
+fig1 <- ggplot(data = df) +
+  geom_point(aes(phi+0.005, phi_ergm-phi, colour = "ergm")) +
+  geom_point(aes(phi-0.005, phi_true-phi, colour = "true")) +
+  geom_point(aes(phi+0.01, phi_alumni-phi, colour = "alumni"))+
+  geom_point(aes(phi-0.01, phi_obs-phi, colour = "obs")) +
+  geom_errorbar(aes(phi+0.005, ymin = (phi_ergm - phi)- 1.96 * phi_ergm_sd, ymax = (phi_ergm - phi) + 1.96 * phi_ergm_sd, colour = "ergm")) +
+  geom_errorbar(aes(phi-0.005, ymin = (phi_true-phi) - 1.96 * phi_true_sd, ymax = (phi_true-phi)+  1.96 * phi_true_sd, colour = "true"))  +
+  geom_errorbar(aes(phi+0.01, ymin = (phi_alumni-phi) - 1.96 * phi_alumni_sd, ymax = (phi_alumni-phi)+ 1.96 * phi_alumni_sd, colour = "alumni"))  +
+  geom_errorbar(aes(phi-0.01, ymin =  (phi_obs-phi)- 1.96 * phi_obs_sd, ymax = (phi_obs-phi)+  1.96 * phi_obs_sd, colour = "obs")) +
+  ylab("phi-phi0") + theme_minimal()
 fig1
-
-fig2 <- ggplot(data = df) +   
-  geom_hline(aes(yintercept= beta_X)) +
-  geom_point(aes(phi, beta_X_ergm, colour = "ergm")) +
-  geom_point(aes(phi, beta_X_nlls, colour = "nlls")) +
-  geom_errorbar(aes(phi, ymin = beta_X_ergm - 1.96 * beta_X_ergm_sd, ymax = beta_X_ergm + 1.96 * beta_X_ergm_sd, colour = "ergm")) +
-  geom_errorbar(aes(phi, ymin = beta_X_nlls - 1.96 * beta_X_nlls_sd, ymax = beta_X_nlls + 1.96 * beta_X_nlls_sd, colour = "nlls"))  +
-  facet_wrap(c("beta_X", "psi"), ncol = 3) +
-  scale_colour_manual(name="Type", values=c(ergm="red", nlls="blue"))+
-  coord_cartesian( ylim = c(-1, 12)) +
-  ylab("beta") + theme_minimal()
-fig2
-
-fig3 <- ggplot(data = df) +   
-  geom_hline(aes(yintercept= alpha)) +
-  geom_point(aes(phi, alpha_ergm, colour = "ergm")) +
-  geom_point(aes(phi, alpha_nlls, colour = "nlls")) +
-  geom_errorbar(aes(phi, ymin = alpha_ergm - 1.96 * alpha_ergm_sd, ymax = alpha_ergm + 1.96 * alpha_ergm_sd, colour = "ergm")) +
-  geom_errorbar(aes(phi, ymin = alpha_nlls - 1.96 * alpha_nlls_sd, ymax = alpha_nlls + 1.96 * alpha_nlls_sd, colour = "nlls"))  +
-  facet_wrap(c("beta_X", "psi"), ncol = 3) +
-  scale_colour_manual(name="Type", values=c(ergm="red", nlls="blue"))+
-  coord_cartesian( ylim = c(-1, 1)) +
-  ylab("alpha") + theme_minimal()
-fig3

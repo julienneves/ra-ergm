@@ -37,8 +37,13 @@ GenerateNetwork <- function(params_net){
   G <- network.initialize(n , directed = FALSE)
 
   # Generate ERGM distribution using seed
-  net_formation_alumni <- ergm(formula_alumni, target.stats = target_stats_alumni)
-  G_alumni <- simulate(net_formation_alumni)
+  
+  if (target_stats_alumni == "density"){
+    G_alumni<-network(n, directed=FALSE, density=0.1)
+  } else{
+    net_formation_alumni <- ergm(formula_alumni, target.stats = target_stats_alumni)
+    G_alumni <- simulate(net_formation_alumni)   
+  }
   
   net_formation_true <- ergm(formula_true, target.stats = target_stats_true)
   G_obs <- simulate(net_formation_true)
@@ -55,26 +60,3 @@ GenerateNetwork <- function(params_net){
               net_formation_alumni = net_formation_alumni, 
               net_formation_true = net_formation_true))
 }
-
-## Old version
-# formula_obs <- as.formula(paste("G ~ nodecov('xi') + ", paste(terms, collapse = " + ")))
-# formula_true <- as.formula(paste("G ~ ", paste(terms, collapse = " + ")))
-# 
-# G <- network.initialize(n , directed = FALSE)
-# G %v% 'xi' <- xi
-# 
-# # Generate ERGM distribution using seed
-# net_formation_obs <- ergm(formula_obs, target.stats = c(target_xi, target_stats))
-# 
-# net_formation_true<- ergm(formula_true, target.stats = target_stats)
-# net_formation_true$coef <- net_formation_obs$coef[terms]
-# 
-# G_true <- simulate(net_formation_true)
-# G_obs <- simulate(net_formation_obs)
-# 
-# # Estimate ERGM on G
-# net_formation_est <- ergm(as.formula(paste("G_obs ~ sociality +", paste(terms, collapse = " + "))))
-# 
-# # Drop the sender/receiver (xi) from the coefficients of the model
-# net_formation_est$coef <- net_formation_est$coef[terms]
-# net_formation_est$formula <-  as.formula(paste("G_obs ~", paste(terms, collapse = " + ")))
