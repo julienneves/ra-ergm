@@ -4,12 +4,16 @@ EstimateModel <- function(dgp_net, params_model) {
   
   coef_true <- params_model[c("alpha", "beta_X", "phi")]
   
+  cat(sprintf("True network"))
   coef_nlls_true <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "true")
   
+  cat(sprintf("Observed network"))
   coef_nlls_obs <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "obs")
   
+  cat(sprintf("Alumni network"))
   coef_nlls_alumni <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "alumni")
   
+  cat(sprintf("ERGM network"))
   coef_ergm <- tryCatch({EstimateERGM(data, dgp_net, start_val = coef_true, repl = params_model$B)})
   
   return(list(coef_ergm = coef_ergm, 
