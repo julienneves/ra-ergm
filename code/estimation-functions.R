@@ -5,21 +5,21 @@ EstimateModel <- function(dgp_net, params_model) {
   coef_true <- params_model[c("alpha", "beta_X", "phi")]
   
   cat(sprintf("True network"))
-  coef_nlls_true <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "true")
+  fit_true <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "true")
   
   cat(sprintf("Observed network"))
-  coef_nlls_obs <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "obs")
+  fit_obs <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "obs")
   
   cat(sprintf("Alumni network"))
-  coef_nlls_alumni <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "alumni")
+  fit_alumni <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "alumni")
   
   cat(sprintf("ERGM network"))
-  coef_ergm <- tryCatch({EstimateERGM(data, dgp_net, start_val = coef_true, repl = params_model$B)})
+  fit_ergm <- tryCatch({EstimateERGM(data, dgp_net, start_val = coef_true, repl = params_model$B)})
   
-  return(list(coef_ergm = coef_ergm, 
-              coef_nlls_true = coef_nlls_true, 
-              coef_nlls_obs = coef_nlls_obs, 
-              coef_nlls_alumni = coef_nlls_alumni, 
+  return(list(fit_ergm = fit_ergm, 
+              fit_true = fit_true, 
+              fit_obs = fit_obs, 
+              fit_alumni = fit_alumni, 
               coef_true = as.data.frame(coef_true)))
 }
 
@@ -38,8 +38,8 @@ EstimateNLLS <- function(data, dgp_net, start_val, type) {
   fit<- net_dep(formula = "y ~ X", data = data, G = G, 
                       model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
                       start.val = start_val, endogeneity = FALSE)
-  coef_nlls <- t(coef(fit[[1]]))
-  return(coef_nlls)
+  #coef_nlls <- t(coef(fit[[1]]))
+  return(fit)
 }
 
 
@@ -56,7 +56,7 @@ EstimateERGM <- function(data, dgp_net, start_val, repl = 99) {
   fit <- net_dep(formula = "y ~ X", data = df, G = G, 
                       model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
                       start.val = start_val, endogeneity = FALSE)
-  coef_ergm <- t(coef(fit[[1]]))
-  return(coef_ergm)
+ # coef_ergm <- t(coef(fit[[1]]))
+  return(fit)
 }
 

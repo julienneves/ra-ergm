@@ -1,11 +1,12 @@
+#####
 library(tidyverse)
 
-library(parallel)
-
-library(miscTools)
 library(econet)
-library(Matrix)
 library(statnet)
+
+library(parallel)
+library(miscTools)
+library(Matrix)
 
 # source('~/Dropbox/Work/Research/ergm/code/estimation-functions.R')
 # source('~/Dropbox/Work/Research/ergm/code/generative-functions.R')
@@ -18,22 +19,24 @@ source('~/GitHub/ra-ergm/code/ploting-functions.R')
 # Set seed
 set.seed(123)
 
+#####
 ## Create network
 # Set parameters
 params_net <- list(n = 50,
                    xi = rnorm(50),
-                   target_stats_alumni = 0.1,
+                   target_stats_alumni = 0.2,
                    terms_alumni = "density",
-                   target_stats_true = c(1, .15, -1.67), 
-                   terms_true = c("offset(hamming(G_alumni))", "offset(triangle)", "offset(edges)"),
-                   terms_est = c("hamming(G_alumni)", "triangle", "edges"),
-                   target_stats_xi = 2)
+                   target_stats_true = c(.4, -.15, -1.7),
+                   terms = c("hamming(G_alumni)", "triangle", "edges"),
+                   target_stats_xi = 1)
 
 # Generate network
-dgp_net <- GenerateNetworkEndo(params_net)
+dgp_net <- GenerateNetwork(params_net)
+
+dgp_net$net_formation_est
 
 plot(simulate(dgp_net$net_formation_est))
-plot(dgp_net$xi,dgp_net$xi_est/params_net$target_stats_xi)
+plot(dgp_net$xi,dgp_net$xi_hat/params_net$target_stats_xi, ylim = c(-3,3))
 
 
 # Plot true and observed network
@@ -48,6 +51,7 @@ title("Observed Network")
 dev.off()
 
 
+#####
 params_model <- list(alpha = 0, 
                      beta_X = 0.2, 
                      phi = .2,
@@ -66,6 +70,7 @@ psi <- 1
 sigma_e <- c(1)
 B <- 99
 
+#####
 # Set number of replications
 repl <- 250
 
@@ -105,3 +110,5 @@ for (i in 1:nrow(params)){
   result[[i]] <- parLapply(cl, 1:repl, function(x, ...) EstimateModel(...), dgp_net, params_model)
   cat("Trial",i,"Out of",nrow(params))
 }
+
+
