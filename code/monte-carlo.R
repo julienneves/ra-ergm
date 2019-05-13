@@ -16,8 +16,8 @@ source('~/GitHub/ra-ergm/code/estimation-functions.R')
 source('~/GitHub/ra-ergm/code/generative-functions.R')
 source('~/GitHub/ra-ergm/code/ploting-functions.R')
 
-# Set seed
-set.seed(123)
+folder <- paste("output/result", Sys.Date(), sep = "-")
+dir.create(folder)
 
 #####
 ## Create network
@@ -50,28 +50,35 @@ plot(dgp_net$G_obs,  coord = expand.grid(1:ceiling(sqrt(params_net$n)),1:ceiling
 title("Observed Network")
 dev.off()
 
-
-#####
-params_model <- list(alpha = 0, 
-                     beta_X = 0.2, 
-                     phi = 0,
-                     psi = 1,
-                     sigma_e =  .5,
+params_model <- list(alpha = 0,
+                     beta_X = 0,
+                     phi = 0.2,
+                     psi = 0,
+                     sigma_e =  0.2,
                      B = 100)
-fit <- EstimateModel(dgp_net, params_model)
+fit <- EstimateModel(params_model, params_net, dgp_net)
 
 #####
 ## Run Monte Carlo simulation
 # Set parameters grid
 alpha <- 0
-beta <- c(0, 0.5)
+beta <- c(0)
 phi <- c(-0.2, -0.1, 0, 0.1, 0.2)
-psi <- c(1, 0, 10)
-sigma_e <- .5
-B <- 99
+psi <- c(0)
+sigma_e <- 0.1
+B <- 100
 
 # Set number of replications
 repl <- 100
+
+# Set parameters
+params_net <- list(n = 50,
+                   xi = rnorm(50),
+                   target_stats_alumni = 0.2,
+                   terms_alumni = "density",
+                   target_stats_true = c(.4, -.15, -1.7),
+                   terms = c("hamming(G_alumni)", "triangle", "edges"),
+                   target_stats_xi = 1)
 
 # Create a data frame to hold parameters and p-values
 params <- expand.grid(alpha, beta, phi, psi, sigma_e, B)
@@ -82,15 +89,17 @@ result <- vector("list", nrow(params))
 
 
 numCores <- detectCores()
+
+
+for (i in 1:nrow(params)){
 cl <- makeCluster(numCores)
 clusterEvalQ(cl, {
   library(tidyverse)
-  library(parallel)
+  library(econet)
+  library(statnet)
   
   library(miscTools)
-  library(econet)
   library(Matrix)
-  library(statnet)
 })
 
 clusterExport(cl, c("EstimateModel", 
@@ -98,15 +107,19 @@ clusterExport(cl, c("EstimateModel",
                     "EstimateNLLS", 
                     "EstimateERGM"))
 
-
-for (i in 1:nrow(params)){
   params_model <- list(alpha = params[i,"alpha"], 
                        beta_X = params[i,"beta_X"], 
                        phi = params[i,"phi"],
                        psi = params[i, "psi"],
                        sigma_e =  params[i,"sigma_e"],
                        B =  params[i,"B"])
-  result[[i]] <- parLapply(cl, 1:repl, function(x, ...) EstimateModel(...), dgp_net, params_model)
+  result[[i]] <- parLapply(cl, 1:repl, function(x, ...) EstimateModel(...), params_model, params_net, dgp_net)
   cat("Trial",i,"Out of",nrow(params), "\n")
-  save.image("~/Dropbox/Work/Research/ergm/output/result_05_8.RData")
+  save.image("~/GitHub/ra-ergm/output/result_5_8.RData")
+  
+  stopCluster(cl)
 }
+
+
+# Plot results
+PlotStat(result, folder)
