@@ -25,20 +25,20 @@ EstimateModel <- function(params_model,params_net, dgp_net = NULL) {
   fit_obs <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "obs")
 
   
-  cat(sprintf("ERGM with correction\n"))
+  cat(sprintf("Observed with correction\n"))
   start_val$beta_xi <- params_model$psi
-  fit_cor <- EstimateERGM(data, dgp_net, start_val = start_val, repl = params_model$B, correction = TRUE)
+  fit_cor <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "obs", correction = TRUE)
   
   est <- data.frame(ergm = summary(fit_ergm)$coefficients[,"Estimate"],
-                    cor = summary(fit_cor)$coefficients[1:3,"Estimate"],
                     true = summary(fit_true)$coefficients[,"Estimate"],
                     obs = summary(fit_obs)$coefficients[,"Estimate"],
-                    alumni = summary(fit_alumni)$coefficients[,"Estimate"])
+                    alumni = summary(fit_alumni)$coefficients[,"Estimate"],
+                    cor = summary(fit_cor)$coefficients[1:3,"Estimate"])
   std <-  data.frame(ergm = summary(fit_ergm)$coefficients[,"Std. Error"],
-                     cor = summary(fit_cor)$coefficients[1:3,"Estimate"],
                      true = summary(fit_true)$coefficients[,"Std. Error"],
                      obs = summary(fit_obs)$coefficients[,"Std. Error"],
-                     alumni = summary(fit_alumni)$coefficients[,"Std. Error"])
+                     alumni = summary(fit_alumni)$coefficients[,"Std. Error"],
+                     cor = summary(fit_cor)$coefficients[1:3,"Std. Error"])
   
   
   coef_true <- data.frame(params = unlist(coef_true))
@@ -50,7 +50,7 @@ EstimateModel <- function(params_model,params_net, dgp_net = NULL) {
               tval = tval))
 }
 
-EstimateNLLS <- function(data, dgp_net, start_val, type) {
+EstimateNLLS <- function(data, dgp_net, start_val, type, correction = NULL) {
   
   if (type == "true"){
     G <- as.matrix(dgp_net$G_true)
@@ -62,9 +62,18 @@ EstimateNLLS <- function(data, dgp_net, start_val, type) {
     warning("No G specified")
   }
   
-  fit<- net_dep(formula = "y ~ X", data = data, G = G, 
-                      model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
-                      start.val = start_val, endogeneity = FALSE)
+  
+  if (is.null(correction)){
+    fit<- net_dep(formula = "y ~ X", data = data, G = G, 
+                  model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
+                  start.val = start_val, endogeneity = FALSE)
+  } else {
+    data <- bind_cols(data, xi = dgp_net$xi_hat)
+    
+    fit<- net_dep(formula = "y ~ X", data = data, G = G, 
+                  model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
+                  start.val = start_val, endogeneity = FALSE)   
+  }
   return(fit)
 }
 
