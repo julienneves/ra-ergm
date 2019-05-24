@@ -1,4 +1,4 @@
-EstimateModel <- function(params_model,params_net, dgp_net = NULL) {
+EstimateModel <- function(params_model,params_net, dgp_net = NULL, boot = NULL) {
   
   if (is.null(dgp_net)){
     dgp_net <- GenerateNetwork(params_net)
@@ -9,25 +9,25 @@ EstimateModel <- function(params_model,params_net, dgp_net = NULL) {
   
   
   coef_true <- params_model[c("alpha", "beta_X", "phi")]
-  start_val <- coef_true
+  start_val <- NULL
   
   cat(sprintf("ERGM network\n"))
-  fit_ergm <- EstimateERGM(data, dgp_net, start_val = coef_true, repl = params_model$B)
+  fit_ergm <- EstimateERGM(data, dgp_net, start_val = start_val, repl = params_model$B)
   
   cat(sprintf("True network\n"))
-  fit_true <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "true")
+  fit_true <- EstimateNLLS(data, dgp_net, start_val = start_val, type = "true")
   
   cat(sprintf("Alumni network\n"))
-  fit_alumni <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "alumni")
+  fit_alumni <- EstimateNLLS(data, dgp_net, start_val = start_val, type = "alumni")
   
   
   cat(sprintf("Observed network\n"))
-  fit_obs <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "obs")
+  fit_obs <- EstimateNLLS(data, dgp_net, start_val = start_val, type = "obs")
 
   
   cat(sprintf("Observed with correction\n"))
-  start_val$beta_xi <- params_model$psi
-  fit_cor <- EstimateNLLS(data, dgp_net, start_val = coef_true, type = "obs", correction = TRUE)
+  # start_val$beta_xi <- params_model$psi
+  fit_cor <- EstimateNLLS(data, dgp_net, start_val = start_val, type = "obs", correction = TRUE)
   
   est <- data.frame(ergm = summary(fit_ergm)$coefficients[,"Estimate"],
                     true = summary(fit_true)$coefficients[,"Estimate"],
@@ -70,7 +70,7 @@ EstimateNLLS <- function(data, dgp_net, start_val, type, correction = NULL) {
   } else {
     data <- bind_cols(data, xi = dgp_net$xi_hat)
     
-    fit<- net_dep(formula = "y ~ X", data = data, G = G, 
+    fit<- net_dep(formula = "y ~ X + xi", data = data, G = G, 
                   model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
                   start.val = start_val, endogeneity = FALSE)   
   }
@@ -78,7 +78,7 @@ EstimateNLLS <- function(data, dgp_net, start_val, type, correction = NULL) {
 }
 
 
-EstimateERGM <- function(data, dgp_net, start_val, repl = 99, correction = NULL) {
+EstimateERGM <- function(data, dgp_net, start_val, repl = 99, correction = NULL, boot = NULL) {
 
   G_obs <- dgp_net$G_obs
   G_alumni <- dgp_net$G_alumni
@@ -101,7 +101,11 @@ EstimateERGM <- function(data, dgp_net, start_val, repl = 99, correction = NULL)
                    model = "model_B", estimation = "NLLS",  hypothesis = "lim", 
                    start.val = start_val, endogeneity = FALSE)    
   }
-  
-  return(fit)
+  if (is.null(boot)){
+    return(fit)
+  } else {
+    x <- boot(fit, hypothesis = "lim", niter = 99, weights = FALSE)
+    return(fit)
+  }
 }
 

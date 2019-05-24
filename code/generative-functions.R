@@ -46,6 +46,7 @@ GenerateNetwork <- function(params_net){
   # Generate ERGM distribution using seed
   G <- network.initialize(n , directed = FALSE)
   G %v% 'xi' <- xi
+  G %v% 'X' <- X[, 1]
   
   
   if (terms_alumni == "density"){
@@ -60,6 +61,7 @@ GenerateNetwork <- function(params_net){
   
   G_obs <- simulate(net_formation_obs)
   G_true <- simulate(net_formation_true)
+
   
   # Estimate ERGM on G
   net_formation_est <- ergm(formula_est, estimate = "MPLE")
