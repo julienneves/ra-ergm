@@ -1,0 +1,157 @@
+%% LyX 2.3.2 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[12pt,english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{setspace}
+\usepackage[authoryear]{natbib}
+\onehalfspacing
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\setcounter{MaxMatrixCols}{10}
+%TCIDATA{OutputFilter=LATEX.DLL}
+%TCIDATA{Version=5.50.0.2890}
+%TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
+%TCIDATA{BibliographyScheme=Manual}
+%TCIDATA{Created=Thursday, December 27, 2012 16:42:32}
+%TCIDATA{LastRevised=Wednesday, January 02, 2013 18:35:45}
+%TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
+%TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
+%TCIDATA{CSTFile=40 LaTeX article.cst}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{solution}[theorem]{Solution}
+\newtheorem{summary}[theorem]{Summary}
+%\newenvironment{proof}[1][Proof]{\noindent\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
+%\input{tcilatex}
+\usepackage{adjustbox}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+
+\makeatother
+
+\usepackage{babel}
+
+
+% Usefuls Macros
+\newcommand{\field}[1]{\mathbb{#1}}
+\newcommand{\N}{\field{N}} % natural numbers
+\newcommand{\R}{\field{R}} % real numbers
+\newcommand{\Z}{\field{Z}} % integers
+\newcommand\F{\mathcal{F}}
+\newcommand\B{\mathbb{B}}
+\renewcommand{\Re}{\R} % reals
+\newcommand{\Rn}[1]{\mathbb{R}^{#1}}
+\newcommand{\1}{{\bf 1}} % vector of all 1's
+\newcommand{\I}[1]{\mathbb{I}_{\left\{#1\right\}}} % indicator function
+\newcommand{\La}{\mathscr{L}}
+% \newcommand{\tends}{{\rightarrow}} % arrow for limits
+% \newcommand{\ra}{{\rightarrow}} % abbreviation for right arrow
+% \newcommand{\subjectto}{\mbox{\rm subject to}} % subject to
+
+%% math operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\maximize}{maximize}
+\DeclareMathOperator*{\minimize}{minimize}
+\DeclareMathOperator{\E}{\mathbb{E}} % expectation
+\newcommand{\Ex}[1]{\E\left\{#1\right\}} % expectation with brackets
+\DeclareMathOperator{\pr}{\mathbb{P}} % probability
+\newcommand{\prob}[1]{\pr\left( #1 \right)}
+\DeclareMathOperator{\subjectto}{{s.t.\ }} % subject to
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\card}[1]{\left|#1\right|}
+
+% Extra stuff
+\newcommand\seq[1]{\{ #1 \}}
+\newcommand{\inp}[2]{\langle #1, #2 \rangle}
+
+\newcommand{\inv}{^{-1}}
+
+\newcommand{\pa}[1]{\left(#1\right)}
+\newcommand{\bra}[1]{\left[#1\right]}
+\newcommand{\cbra}[1]{\left\{ #1 \right\}}
+
+\newcommand{\pfrac}[2]{\pa{\frac{#1}{#2}}}
+\newcommand{\bfrac}[2]{\bra{\frac{#1}{#2}}}
+
+\newcommand{\mat}[1]{\begin{matrix}#1\end{matrix}}
+\newcommand{\pmat}[1]{\pa{\mat{#1}}}
+\newcommand{\bmat}[1]{\bra{\mat{#1}}}
+
+
+\begin{document}
+\title{ERGM and SAR}
+\author{Julien Neves\thanks{Cornell University E-Mail: jmn252@cornell.edu}}
+\maketitle
+
+\medskip{}
+
+
+\section*{Model}
+
+Let $G$ be the observed network and assume it is derived from the following distribution
+\[P(G = g \mid \theta,\phi) = \frac{\exp\cbra{\theta^Ts(g) + \phi \xi}}{c(\theta,\phi)}\]
+where $\xi$ is some vector of unobservables characteristics for the agents and $s(y)$ a vector of statistics for the network.
+
+Let's assume that we are trying to estimate the following model
+\[
+	Y  = \lambda G Y + X\beta + \underbrace{\psi \xi + \nu}_{\epsilon}
+\]
+where $\nu\sim N(0,\sigma_\nu^2)$.
+
+The issue we face is that $G$ is obviously endogenous and therefore we can't use the following moment conditions:
+\[
+\Ex{H'\epsilon(\lambda,\beta,\psi)} = 0
+\]
+where $H = \cbra{X, GX, G^2X, \dots}$.
+
+\section*{Estimation}
+To solve the endogeneity problem, first we need to fit an Exponential Random Graph Model (ERGM) using our $G$ and MCMC. This should yields some, hopefully consistent, sample estimates $\hat{\theta}$ and $\hat{\xi}$.
+
+Using these estimates, let's define the following ERGM
+\[P(\tilde{G} = g \mid \theta,\phi) = \frac{\exp\cbra{\hat{\theta}^Ts(g)}}{c(\theta,\phi)}\]
+
+Let $\tilde{G}$ be some realization of the previous distribution. Since $\tilde{G}$ should technically get rid of $\xi$, do we expect that the following holds
+\[
+\Ex{\Ex{\tilde{H}'\epsilon(\lambda,\beta,\psi)\mid \tilde{G}}} = 0
+\]
+where $H = \cbra{X, \tilde{G}X, \tilde{G}^2X, \dots}$? If so, can't we simply to use NLLS without having to do any method of simulated moments?
+
+If instead, we are assuming that there is some function $\pi(\theta)$, that might not be known, such that
+\[
+\Ex{\Ex{\tilde{H}'\epsilon(\lambda,\beta,\psi)\mid \tilde{G}}} = \pi(\theta)
+\]
+Then, how do we generate $\epsilon(\lambda,\beta,\psi)$ without observing $\xi$? What kind of distributional assumption would we make for $\epsilon$?
+
+
+\end{document}

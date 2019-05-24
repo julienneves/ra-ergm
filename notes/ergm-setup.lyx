@@ -1,0 +1,780 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\setcounter{MaxMatrixCols}{10}
+%TCIDATA{OutputFilter=LATEX.DLL}
+%TCIDATA{Version=5.50.0.2890}
+%TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
+%TCIDATA{BibliographyScheme=Manual}
+%TCIDATA{Created=Thursday, December 27, 2012 16:42:32}
+%TCIDATA{LastRevised=Wednesday, January 02, 2013 18:35:45}
+%TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
+%TCIDATA{<META NAME="DocumentShell" CONTENT="Standard LaTeX\Blank - Standard LaTeX Article">}
+%TCIDATA{CSTFile=40 LaTeX article.cst}
+
+\newtheorem{theorem}{Theorem}\newtheorem{acknowledgement}[theorem]{Acknowledgement}\newtheorem{algorithm}[theorem]{Algorithm}\newtheorem{axiom}[theorem]{Axiom}\newtheorem{case}[theorem]{Case}\newtheorem{claim}[theorem]{Claim}\newtheorem{conclusion}[theorem]{Conclusion}\newtheorem{condition}[theorem]{Condition}\newtheorem{conjecture}[theorem]{Conjecture}\newtheorem{corollary}[theorem]{Corollary}\newtheorem{criterion}[theorem]{Criterion}\newtheorem{definition}[theorem]{Definition}\newtheorem{example}[theorem]{Example}\newtheorem{exercise}[theorem]{Exercise}\newtheorem{lemma}[theorem]{Lemma}\newtheorem{notation}[theorem]{Notation}\newtheorem{problem}[theorem]{Problem}\newtheorem{proposition}[theorem]{Proposition}\newtheorem{remark}[theorem]{Remark}\newtheorem{solution}[theorem]{Solution}\newtheorem{summary}[theorem]{Summary}\usepackage{adjustbox}
+\usepackage{booktabs}
+
+
+
+
+\usepackage{babel}
+
+
+
+% Usefuls Macros
+\newcommand{\field}[1]{\mathbb{#1}}
+\newcommand{\N}{\field{N}} % natural numbers
+\newcommand{\R}{\field{R}} % real numbers
+\newcommand{\Z}{\field{Z}} % integers
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\B}{\mathbb{B}}
+\renewcommand{\Re}{\R} % reals
+\newcommand{\Rn}[1]{\mathbb{R}^{#1}}
+\newcommand{\1}{{\bf 1}} % vector of all 1's
+\newcommand{\I}[1]{\mathbb{I}_{\left\{#1\right\}}} % indicator function
+\newcommand{\La}{\mathscr{L}}
+% \newcommand{\tends}{{\rightarrow}} % arrow for limits
+% \newcommand{\ra}{{\rightarrow}} % abbreviation for right arrow
+% \newcommand{\subjectto}{\mbox{\rm subject to}} % subject to
+
+%% math operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\maximize}{maximize}
+\DeclareMathOperator*{\minimize}{minimize}
+\DeclareMathOperator{\E}{\mathbb{E}} % expectation
+\newcommand{\Ex}[1]{\E\left\{#1\right\}} % expectation with brackets
+\DeclareMathOperator{\pr}{\mathbb{P}} % probability
+\newcommand{\prob}[1]{\pr\left( #1 \right)}
+\DeclareMathOperator{\subjectto}{{s.t.\ }} % subject to
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\card}[1]{\left|#1\right|}
+
+% Extra stuff
+\newcommand{\seq}[1]{\{ #1 \}}
+\newcommand{\inp}[2]{\langle #1, #2 \rangle}
+
+\newcommand{\inv}{^{-1}}
+
+\newcommand{\pa}[1]{\left(#1\right)}
+\newcommand{\bra}[1]{\left[#1\right]}
+\newcommand{\cbra}[1]{\left\{ #1 \right\}}
+
+\newcommand{\pfrac}[2]{\pa{\frac{#1}{#2}}}
+\newcommand{\bfrac}[2]{\bra{\frac{#1}{#2}}}
+
+\newcommand{\mat}[1]{\begin{matrix}#1\end{matrix}}
+\newcommand{\pmat}[1]{\pa{\mat{#1}}}
+\newcommand{\bmat}[1]{\bra{\mat{#1}}}
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding iso8859-15
+\fontencoding T1
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing onehalf
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style plainnat
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+ERGM and SAR
+\end_layout
+
+\begin_layout Author
+Julien Neves
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Cornell University, E-Mail: jmn252@cornell.edu
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Model 
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Model"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's assume that we are trying to estimate the following model 
+\begin_inset Formula 
+\begin{equation}
+Y=\phi G^{true}Y+\alpha+X\beta+\underbrace{\psi\xi+\nu}_{\epsilon}\label{eq:model}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\xi$
+\end_inset
+
+ is some vector of unobservables characteristics, 
+\begin_inset Formula $\nu\sim N(0,\sigma_{\nu}^{2})$
+\end_inset
+
+, and 
+\begin_inset Formula $G^{true}$
+\end_inset
+
+ is some network that comes from an Exponential Random Graph Model (ERGM),
+ i.e.,
+\begin_inset Formula 
+\begin{equation}
+\Pr(G^{true}=g\mid\theta,\vartheta)=\frac{\exp\{\theta^{T}s(g)+\vartheta d_{hamming}(G^{alumni})\}}{c(\theta,\vartheta)}\label{eq:true_distribution}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $s(y)$
+\end_inset
+
+ is a vector of 
+\begin_inset Quotes eld
+\end_inset
+
+sufficient
+\begin_inset Quotes erd
+\end_inset
+
+ statistics for the network, 
+\begin_inset Formula $d_{hamming}$
+\end_inset
+
+is the hamming distance, and 
+\begin_inset Formula $G^{alumni}$
+\end_inset
+
+ is some other network.
+\end_layout
+
+\begin_layout Standard
+The issue we face is that we don't directly observe 
+\begin_inset Formula $G^{true}$
+\end_inset
+
+, but instead we observe some 
+\begin_inset Formula $G^{obs}$
+\end_inset
+
+ drawn from the following distribution
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\Pr(G^{obs}=g\mid\theta,\vartheta,\lambda)=\frac{\exp\{\theta^{T}s(g)+\vartheta d_{hamming}(G^{alumni})+\lambda\xi\}}{c(\theta,\vartheta,\lambda)}\label{eq:obs_distribution}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is straightforward to see that 
+\begin_inset Formula $G^{obs}$
+\end_inset
+
+should be correlated with 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ if 
+\begin_inset Formula $\lambda\neq0$
+\end_inset
+
+ and 
+\begin_inset Formula $\psi\neq0$
+\end_inset
+
+ which makes estimating 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ inconvenient.
+ To circumvent that issue, we start by estimating 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:obs_distribution"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ using 
+\begin_inset Formula $G^{obs}$
+\end_inset
+
+and 
+\begin_inset Formula $G^{alumni}$
+\end_inset
+
+.
+ Note that to capture 
+\begin_inset Formula $\eta=\lambda\xi$
+\end_inset
+
+ we can add one network statistic for each node equal to the number of ties
+ of that node.
+ Using 
+\begin_inset Formula $\hat{\theta}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{\vartheta}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\eta}$
+\end_inset
+
+ we currently have two strategies to estimate 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Enumerate
+We start by defining the following ERGM
+\begin_inset Formula 
+\begin{equation}
+\Pr(G=g\mid\hat{\theta},\hat{\vartheta})=\frac{\exp\{\hat{\theta}^{T}s(g)+\hat{\vartheta}d_{hamming}(G^{alumni})\}}{c(\hat{\theta},\hat{\vartheta})}\label{eq:ergm_distribution}
+\end{equation}
+
+\end_inset
+
+From 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:ergm_distribution"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, we draw 
+\begin_inset Formula $B$
+\end_inset
+
+ sample networks 
+\begin_inset Formula $G_{1}^{*},\ldots,G_{B}^{*}$
+\end_inset
+
+ and define 
+\begin_inset Formula 
+\begin{equation}
+G^{ergm}=\begin{bmatrix}G_{1}^{*} & 0 & \cdots & 0\\
+0 & G_{2}^{*} & 0 & \vdots\\
+\vdots & 0 & \ddots & 0\\
+0 & \cdots & 0 & G_{B}^{*}
+\end{bmatrix}\label{eq:ergm_matrix}
+\end{equation}
+
+\end_inset
+
+With 
+\begin_inset Formula $G^{ergm}$
+\end_inset
+
+ we can now estimate 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ using NLLS and 
+\begin_inset Formula $G^{ergm}$
+\end_inset
+
+ in place of 
+\begin_inset Formula $G^{true}$
+\end_inset
+
+.
+ Hopefully, the estimated 
+\begin_inset Formula $\hat{\alpha}^{ergm}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{\beta}^{ergm}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\phi}^{ergm}$
+\end_inset
+
+ have better properties than the ones estimated using 
+\begin_inset Formula $G^{obs}$
+\end_inset
+
+, i.e., 
+\begin_inset Formula $\hat{\alpha}^{obs}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{\beta}^{obs}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\phi}^{obs}$
+\end_inset
+
+.
+ Note that for the moment it is unclear how large 
+\begin_inset Formula $B$
+\end_inset
+
+ should be.
+\end_layout
+
+\begin_layout Enumerate
+Instead of estimating 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ using NLLS and 
+\begin_inset Formula $G^{obs}$
+\end_inset
+
+ directly, we can modify 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ by including the estimated 
+\begin_inset Formula $\hat{\eta}=\widehat{\lambda\epsilon}$
+\end_inset
+
+ from 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:obs_distribution"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ in our regressors, i.e.,
+\begin_inset Formula 
+\begin{equation}
+Y=\phi G^{obs}Y+X\beta+\kappa\hat{\eta}+\epsilon\label{eq:model-corr}
+\end{equation}
+
+\end_inset
+
+If 
+\begin_inset Formula $\hat{\eta}=\widehat{\lambda\epsilon}$
+\end_inset
+
+ is co-linear with the unobservable 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+, then maybe our estimates 
+\begin_inset Formula $\hat{\alpha}^{cor}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{\beta}^{cor}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\phi}^{cor}$
+\end_inset
+
+could be close to the true 
+\begin_inset Formula $\alpha$
+\end_inset
+
+, 
+\begin_inset Formula $\beta$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi$
+\end_inset
+
+.
+  
+\end_layout
+
+\begin_layout Section*
+Updates
+\end_layout
+
+\begin_layout Subsection*
+May 12
+\end_layout
+
+\begin_layout Standard
+Currently, we are using the following specification for the ERGM
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\Pr(G^{obs}=g\mid\xi)=\frac{\exp\{.15\cdot triangles-1.67\cdot edges+1\cdot d_{hamming}(G^{alumni})+2\cdot\xi\}}{c(\cdots)}\label{eq:obs_distribution-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\begin_inset Formula $n=50$
+\end_inset
+
+, 
+\begin_inset Formula $\xi\sim N(0,1)$
+\end_inset
+
+ and 
+\begin_inset Formula $G^{alumni}$
+\end_inset
+
+ be a Bernoulli random graph with density equal to 0.1.
+\end_layout
+
+\begin_layout Standard
+To see if either strategies mentioned in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Model"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+work, we simulate the 
+\begin_inset Formula $Y$
+\end_inset
+
+ using some combination of parameters and test if the confidence interval
+ produced actually cover these parameters.
+ Hopefully, the 90% confidence interval should have a 90% coverage rate.
+ The following figures show that we are facing some problems currently.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename /home/julien/Dropbox/Work/Research/ergm/output/result-2019-05-12/phi-new.pdf
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename /home/julien/Dropbox/Work/Research/ergm/output/result-2019-05-12/alpha-new.pdf
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename /home/julien/Dropbox/Work/Research/ergm/output/result-2019-05-12/beta-new.pdf
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+First, we get a lot of variance in the coverage rate, This is particularly
+ distressful when looking at the 
+\begin_inset Quotes eld
+\end_inset
+
+true
+\begin_inset Quotes erd
+\end_inset
+
+ line which represents the coverage rate of our confidence interval if actually
+ had the true network 
+\begin_inset Formula $G^{true}.$
+\end_inset
+
+ Theoretically, it should have a coverage rate of at least 90% for any combinati
+on of parameters which is not the case in our figures.
+\end_layout
+
+\begin_layout Standard
+Secondly, coverage rates are all over the place.
+ They don't seem to even follow some particular trends.
+ Looking at the 
+\begin_inset Formula $\phi$
+\end_inset
+
+ figure, it makes no sense for the 
+\begin_inset Quotes eld
+\end_inset
+
+cor
+\begin_inset Quotes erd
+\end_inset
+
+ line to have 100% coverage rate everywhere except at 
+\begin_inset Formula $\phi=-0.1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+To fix this, there's two obvious candidates to check first:
+\end_layout
+
+\begin_layout Enumerate
+Standard deviations.
+ I suspect that the standard deviations that the net_dep() function spits
+ out might be incorrect.
+ We might get better results using bootstrap confidence intervals.
+\end_layout
+
+\begin_layout Enumerate
+ERGM specification.
+ It might be that the ERGM is not well-behaved for our problem and that
+ it is responsible for the oddities we are getting.
+\end_layout
+
+\begin_layout Subsection*
+May 17
+\end_layout
+
+\begin_layout Standard
+After a lot of testing, it seems that using bootstrap is not much of an
+ improvement over standard estimation.
+ In fact, the bootstrap standard errors are very close to the ones that
+ NLLS gives out (within 2-3%).
+ Even though I haven't fix the problem yet, the silver lining is that it
+ doesn't lie with using bootstrap, which takes forever to compute, instead
+ standard asymptotics.
+\end_layout
+
+\begin_layout Subsection*
+May 21
+\end_layout
+
+\begin_layout Standard
+I modified the ERGM to the following
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\Pr(G^{obs}=g\mid\xi,X)=\frac{\exp\begin{Bmatrix}.15\cdot triangles-2\cdot edges+.4\cdot d_{hamming}(G^{alumni})+\\
+-.5\cdot nodematch(X)+1\cdot\xi
+\end{Bmatrix}}{c(\cdots)}\label{eq:obs_distribution-1-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\begin_inset Formula $n=50$
+\end_inset
+
+, 
+\begin_inset Formula $\xi\sim N(0,1)$
+\end_inset
+
+, 
+\begin_inset Formula $G^{alumni}$
+\end_inset
+
+ be a Bernoulli random graph with density equal to 0.1 and 
+\begin_inset Formula $X_{i}\sim Ber\left(\frac{1}{2}\right)$
+\end_inset
+
+ .
+ Including 
+\begin_inset Formula $X$
+\end_inset
+
+ seems to make the network less dense, which might help our results.
+\end_layout
+
+\begin_layout Standard
+I started a simulation with every possible combinations of the following
+ parameters:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\alpha=[0,0.2]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\beta=[0,0.2]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\phi=[-0.2,-0.1,0,0.1,0.2]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\psi=[0,0.1,1]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\sigma_{\epsilon}=[0.001,0.1,1]$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $B=50$
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
